@@ -1,0 +1,272 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Pizza Place</title>
+    <link href="ui-asset/css/app.css" rel="stylesheet" />
+    <link href="ui-asset/css/controls.css" rel="stylesheet" />
+</head>
+    <body ng-app="app">
+        <div class="banner">
+            <span class="header">Pizza Place</span>
+        </div>
+        <div class="container">
+            <div x-ng-controller="mainCtrl as vm" ng-cloak>
+                <div>
+                    <div class="form-style-2">
+                        <div class="form-style-2-heading">Welcome! Please make an order.</div>
+                        <label for="city">
+                            <span>
+                                Select your city
+                                <span class="required">*</span>
+                            </span>
+                            <select ng-model="vm.orderInfo.city"
+                                    name="city"
+                                    class="select-field"
+                                    x-ng-change="vm.getFranchisesByLocation(vm.orderInfo.city)"
+                                    x-ng-options="item.code as item.name for item in vm.locations">
+                                <option value="">City</option>
+                            </select>
+                        </label>
+                        <label for="franchise" x-ng-show="vm.orderInfo.city">
+                            <span>
+                                Select near by store
+                                <span class="required">*</span>
+                            </span>
+                            <select ng-model="vm.orderInfo.franchise"
+                                    name="franchise"
+                                    class="select-field"
+                                    x-ng-change="vm.getPizzasByFranchise(vm.orderInfo.franchise)"
+                                    x-ng-options="item as item.name for item in vm.franchises">
+                                <option value="">Store</option>
+                            </select>
+                        </label>
+                        <label x-ng-show="vm.orderInfo.city && vm.orderInfo.franchise">
+                            <span>Pizza Type</span>
+                            <select ng-model="vm.orderInfo.pizza"
+                                    class="select-field"
+                                    x-ng-change="vm.getToppingsByFranchiseAndPizza(vm.orderInfo.franchise, vm.orderInfo.pizza)"
+                                    x-ng-options="item as item.name for item in vm.pizzas">
+                                <option value="">Pizza</option>
+                            </select>
+                        </label>
+                        <label x-ng-show="vm.orderInfo.city && vm.orderInfo.franchise && vm.orderInfo.pizza">
+                            <span>Quantity</span>
+                            <select ng-model="vm.orderInfo.pizzaQuantity"
+                                    x-ng-change=""
+                                    class="select-field"
+                                    x-ng-options="item.value as item.value for item in vm.quantity"></select>
+                        </label>
+                        <label x-ng-show="vm.orderInfo.city && vm.orderInfo.franchise && vm.orderInfo.pizza">
+                            <span style="width: 120px">Toppings</span>
+                        </label>
+                    </div>
+                </div>
+                <div x-ng-show="vm.orderInfo.city && vm.orderInfo.franchise && vm.orderInfo.pizza" style="position: relative">
+                    <div style="position: relative;  margin-left: 140px; margin-top: -19px">
+                        <ul>
+                            <li x-ng-repeat="item in vm.toppings" style="">
+                                <input type="checkbox"
+                                       ng-model="item.selected"
+                                       x-ng-change="vm.updateToppingToPizza(item, vm.orderInfo.pizza)" />
+                                {{item.name}}- Price -{{item.price | currency}}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form-style-2">
+                    <label x-ng-show="vm.orderInfo.city && vm.orderInfo.franchise && vm.orderInfo.pizza">
+                        <span>&nbsp;</span>
+                        <input type="button"
+                               value="Add to cart"
+                               class="green"
+                               x-ng-disabled=""
+                               x-ng-click="vm.addToCart(vm.orderInfo.pizza, vm.orderInfo.pizzaQuantity)" />
+                        <input type="button"
+                               value="Clear Cart"
+                               class="red"
+                               x-ng-disabled=""
+                               x-ng-click="vm.orderService.clearCart()" />
+                    </label>
+                    <div class="form-style-2-heading"
+                         x-ng-show="vm.cartInfo.orders.length>0">
+                        Your Order
+                    </div>
+                    <div x-ng-show="vm.cartInfo.orders.length>0">
+                        <div x-ng-repeat="order in vm.cartInfo.orders">
+                            <p>
+                                {{order.item.name}}  -Qunaitty {{order.itemQuantiy}} - Unit Price {{order.unitPrice | currency}}
+                                <input type="button"
+                                       value="Delete Item"
+                                       class="red"
+                                       x-ng-click="vm.orderService.removeItem(order.id)" />
+                            </p>
+                            <ul>
+                                <li x-ng-show="topping.selected"
+                                    x-ng-repeat="topping in order.item.toppings">
+                                    {{topping.name}}
+                                </li>
+                            </ul>
+                            <h4>
+                                Sub Total: {{order.subTotal | currency}}
+                            </h4>
+                        </div>
+                        <h3>
+                            Total: {{vm.cartInfo.totalPrice | currency}}
+                        </h3>
+                        <input type="button"
+                               value="Checkout"
+                               x-ng-click="vm.orderInfo.showForm = true" />
+                    </div>
+                </div>                
+                <div x-ng-show="vm.orderInfo.showForm">
+                    <form name="frmReg">
+                        <div class="form-style-2">
+                            <div class="form-style-2-heading">Please register to place your order</div>
+                            <label for="fName">
+                                <span>
+                                    First Name
+                                    <span class="required">*</span>
+                                </span>
+                                <input type="text"
+                                       name="fName"
+                                       class="input-field"
+                                       x-ng-model="vm.orderInfo.user.firstName"
+                                       placeholder="Frist Name"
+                                       x-ng-minlength=2
+                                       x-ng-maxlength=10
+                                       maxlength="10"
+                                       required="" />
+                            </label>
+                            <span class="error" x-ng-show="frmReg.fName.$dirty && frmReg.fName.$error.required"> First Name is required </span>
+                            <span class="error" x-ng-show="frmReg.fName.$dirty && frmReg.fName.$error.minlength"> Minium 2 charecters is allowed </span>
+                            <label for="lName">
+                                <span>
+                                    Last Name
+                                    <span class="required">*</span>
+                                </span>
+                                <input type="text"
+                                       name="lName"
+                                       class="input-field"
+                                       x-ng-model="vm.orderInfo.user.lastName"
+                                       x-ng-minlength=2
+                                       x-ng-maxlength=10
+                                       maxlength="10"
+                                       placeholder="Last Name"
+                                       required="" />
+                            </label>
+                            <span class="error" x-ng-show="frmReg.lName.$dirty && frmReg.lName.$error.required">
+                                Last Name is required
+                            </span>
+                            <span class="error" x-ng-show="frmReg.lName.$dirty && frmReg.lName.$error.minlength">
+                                Minium 2 charecters is allowed
+                            </span>
+                            <label>
+                                <span>
+                                    Email
+                                    <span class="required">*</span>
+                                </span>
+                                <input type="email"
+                                       name="email"
+                                       class="input-field"
+                                       x-ng-model="vm.orderInfo.user.email"
+                                       placeholder="Email"
+                                       required="" />
+                            </label>
+                            <span class="error" x-ng-show="frmReg.email.$dirty && frmReg.email.$error.required">
+                                Email is required
+                            </span>
+                            <span class="error" x-ng-show="frmReg.email.$error.email">
+                                Please enter valid Email Address
+                            </span>
+                            <label>
+                                <span>
+                                    Address
+                                    <span class="required">*</span>
+                                </span>
+                                <input type="text"
+                                       name="address"
+                                       class="input-field"
+                                       x-ng-model="vm.orderInfo.user.address"
+                                       x-ng-minlength=5
+                                       x-ng-maxlength=40
+                                       maxlength="40"
+                                       placeholder="Address"
+                                       required="" />
+                            </label>
+                            <span class="error" x-ng-show="frmReg.address.$dirty && frmReg.address.$error.required">
+                                Address is required
+                            </span>
+                            <span class="error" x-ng-show="frmReg.address.$dirty && frmReg.address.$error.minlength">
+                                Minium 5 charecters is is allowed
+                            </span>
+                            <label>
+                                <span>
+                                    City
+                                    <span class="required">*</span>
+                                </span>
+                                <input type="text"
+                                       name="city"
+                                       class="input-field"
+                                       readonly
+                                       x-ng-model="vm.orderInfo.city"
+                                       required="" />
+                            </label>
+                            <label>
+                                <span>
+                                    Zip
+                                    <span class="required">*</span>
+                                </span>
+                                <input type="number"
+                                       name="zip"
+                                       class="input-field"
+                                       x-ng-model="vm.orderInfo.user.zip"
+                                       x-ng-minlength=5
+                                       x-ng-maxlength=5
+                                       maxlength="5"
+                                       placeholder="Zip"
+                                       required="" />
+                            </label>
+                            <span class="error" x-ng-show="frmReg.zip.$dirty && frmReg.zip.$error.required">
+                                Address is required
+                            </span>
+                            <span class="error" x-ng-show="frmReg.zip.$dirty && frmReg.zip.$error.minlength">
+                                5 charecters is is allowed
+                            </span>
+                            <span class="error" x-ng-show="frmReg.zip.$dirty && frmReg.zip.$error.maxlength">
+                                5 charecters is is allowed
+                            </span>
+                            <span class="error" x-ng-show="frmReg.zip.$dirty && frmReg.zip.$error.number">
+                                Must be a number
+                            </span>                       
+                            <label>
+                                <span>&nbsp;</span>
+                                <input type="submit"
+                                       x-ng-disabled="frmReg.$invalid"
+                                       x-ng-click="vm.submit(vm.orderInfo.user)"
+                                       value="Submit Order" />
+                                <input type="button"
+                                       class="red"
+                                       x-ng-click="vm.reset(frmReg)"
+                                       value="Reset" />
+                            </label>
+                            <div class="form-style-2-heading"
+                                 x-ng-show="vm.message">
+                                <span>
+                                    {{vm.message}}
+                                </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>        
+
+        <script src="Scripts/angular.min.js"></script>
+        <script src="Scripts/underscore.min.js"></script>
+
+        <script src="app/product/product.service.js"></script>
+        <script src="app/franchise/franchise.service.js"></script>
+        <script src="app/cart/cart.service.js"></script>
+        <script src="app/app.js"></script>
+    </body>
+</html>

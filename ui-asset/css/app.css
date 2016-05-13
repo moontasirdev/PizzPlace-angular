@@ -1,0 +1,40 @@
+﻿
+body {
+    font: 13px Arial, Helvetica, sans-serif;
+}
+.ng-cloak {
+    display: none !important;
+}
+.container {
+    padding-top: 30px;
+    padding-left: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 70%;
+   
+    min-height: 500px;
+    border: #EA7B00 solid;
+    border-width: 0px 2px 2px 2px;
+    
+}
+
+.banner {
+    padding-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 75%;
+    background: #EA7B00;
+    min-height: 90px;
+}
+.header {
+    color: white;
+    font-size: 50px;
+    padding-left: 60px;
+}
+
+span.error {
+    padding-left: 164px;
+    color: red;
+}
+
+.red { background: #FF0040 !important; color: #FFF}
